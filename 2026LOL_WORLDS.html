@@ -1,0 +1,503 @@
+<!doctype html>
+<html>
+<head>
+<meta charset=utf8>
+<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+</head>
+<body>
+<title>小奈 & 魔女大人的世界賽預測應援基地 🦊✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#0a1020;--surface:#111a2e;--surface-2:#16213a;--line:#24324f;--fg:#e8edf7;--muted:#8d9ab6;
+  --gold:#d6ae5a;--gold-ink:#1b1405;--gold-soft:rgba(214,174,90,.14);
+  --ok:#3fcf8e;--ok-soft:rgba(63,207,142,.14);--bad:#ff6b6b;--bad-soft:rgba(255,107,107,.14);--warn:#f2b84b;
+  --xiaonai-pink:#ff8da1;--xiaonai-pink-soft:rgba(255,141,161,.18);
+  --f-disp:"Barlow Condensed","Noto Sans TC",sans-serif;
+  --f-body:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-block:12px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:disabled{cursor:default}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+h1,h2,h3,p{margin:0}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+.mut{color:var(--muted);font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.eyebrow{font:600 12px var(--f-disp);letter-spacing:.16em;text-transform:uppercase;color:var(--xiaonai-pink)}
+h1{font-family:var(--f-disp);font-size:38px;line-height:1.05;font-weight:700;text-wrap:balance}
+.who{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
+.sync{display:inline-flex;align-items:center;gap:6px}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+
+/* Xiaonai Floating Widget */
+.xiaonai-widget{position:fixed;bottom:20px;right:20px;background:var(--surface);border:2px solid var(--xiaonai-pink);border-radius:999px;padding:8px 16px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(255,141,161,0.3);z-index:999;cursor:pointer;transition:transform 0.2s;}
+.xiaonai-widget:hover{transform:scale(1.05)}
+.xiaonai-widget span{font-weight:700;font-size:13px;color:var(--xiaonai-pink)}
+
+.stats{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:8px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.tile .k{font-size:12px;color:var(--muted)}
+.tile .v{font-family:var(--f-disp);font-size:34px;line-height:1.05;font-weight:700;font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px;color:var(--muted)}
+.tile.main .v{font-size:56px;color:var(--gold)}
+@media (max-width:560px){.stats{grid-template-columns:repeat(3,1fr)}.tile.main{grid-column:1/-1}.tile .v{font-size:30px}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+h2{font-size:16px;font-weight:700}
+.chart{display:grid;gap:6px}
+.col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.plot{position:relative;width:100%;height:100px;border-bottom:1px solid var(--line)}
+.plot::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--line)}
+.bar{position:absolute;left:18%;right:18%;bottom:0;background:var(--gold);border-radius:3px 3px 0 0}
+.bar.zero{background:var(--bad)}
+.cl{font:600 14px var(--f-disp);margin-top:4px}
+.cp{font-size:12px;font-variant-numeric:tabular-nums}
+.cn{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:16px}
+
+.nav{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{padding:8px 16px;border-radius:7px;font-weight:500;min-height:40px}
+.seg button.on{background:var(--gold);color:var(--gold-ink)}
+
+.days{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.days.ko{grid-template-columns:repeat(7,1fr)}
+.day{border:1px solid var(--line);border-radius:8px;padding:6px 0;text-align:center;background:var(--surface);min-width:0;display:flex;flex-direction:column;align-items:center;min-height:50px}
+.day b{font:600 15px var(--f-disp)}
+.day span{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.day span.hit{color:var(--ok)}
+.day.on{border-color:var(--gold);background:var(--gold-soft)}
+
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dayhead h2{font-family:var(--f-disp);font-size:24px;font-weight:700}
+.dayhead h2 small{font-family:var(--f-body);font-size:13px;font-weight:400;color:var(--muted);margin-left:8px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 10px;font-size:12px;color:var(--muted)}
+.pill.ok{color:var(--ok);border-color:rgba(63,207,142,.5)}
+.pill.bad{color:var(--bad);border-color:rgba(255,107,107,.5)}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.match{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+.team{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);min-width:0;text-align:center}
+.team .code{font:700 22px/1 var(--f-disp);letter-spacing:.02em}
+.team .nm{font-size:12px;color:var(--fg);line-height:1.3;text-wrap:balance}
+.team .rg{font:600 11px var(--f-disp);letter-spacing:.1em;color:var(--muted)}
+.team .tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:20px}
+.tag{font-size:11px;border-radius:4px;padding:0 6px;line-height:19px;border:1px solid var(--line);color:var(--muted)}
+.tag.w{background:var(--ok-soft);color:var(--ok);border-color:rgba(63,207,142,.5)}
+.tag.p{color:var(--gold);border-color:rgba(214,174,90,.5)}
+.tag.p.ok{color:var(--ok);border-color:rgba(63,207,142,.5)}
+.tag.p.bad{color:var(--bad);border-color:rgba(255,107,107,.5)}
+.team.picked{border-color:var(--xiaonai-pink);background:var(--xiaonai-pink-soft)}
+.team.right{border-color:var(--ok);background:var(--ok-soft)}
+.team.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.team.won:not(.picked){border-color:rgba(63,207,142,.6)}
+.team:not(:disabled):hover{border-color:var(--xiaonai-pink)}
+.mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:52px}
+.mid .bo{font:600 12px var(--f-disp);letter-spacing:.1em;color:var(--gold);border:1px solid rgba(214,174,90,.5);border-radius:4px;padding:0 6px}
+.mid .vs{font:700 14px var(--f-disp);color:var(--muted);display:block}
+.res{font-size:12px;color:var(--muted)}
+.res.ok{color:var(--ok);font-weight:700}
+.res.bad{color:var(--bad);font-weight:700}
+
+.badge{display:inline-grid;place-items:center;width:46px;height:50px;background:var(--tc);color:var(--tx);
+  clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);font:700 13px/1 var(--f-disp);letter-spacing:.02em}
+.badge.sm{width:30px;height:33px;font-size:10px}
+
+.srow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.srow .lab{font-size:12px;color:var(--muted);margin-right:2px}
+.chip{border:1px solid var(--line);border-radius:8px;padding:7px 14px;min-height:40px;font:600 15px var(--f-disp);background:var(--surface-2);font-variant-numeric:tabular-nums}
+.chip.on{background:var(--xiaonai-pink);color:#1b1405;border-color:var(--xiaonai-pink)}
+.chip.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.chip.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.chip:disabled:not(.on):not(.ok):not(.bad){opacity:.5}
+.link{font-size:13px;color:var(--muted);text-decoration:underline;padding:8px 4px;min-height:36px}
+.link.danger{color:var(--bad)}
+.btn{border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:9px 16px;font-weight:700;min-height:42px}
+.btn.fill{background:var(--gold);color:var(--gold-ink)}
+.btn:disabled{opacity:.4}
+.hint{font-size:13px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:22px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:8px;align-items:center}
+.empty b{color:var(--fg)}
+
+.add{display:flex;flex-direction:column;gap:12px}
+.grp{display:flex;flex-direction:column;gap:6px}
+.grp .gl{font:700 15px var(--f-disp);color:var(--gold);letter-spacing:.06em}
+.picks{display:flex;gap:6px;flex-wrap:wrap}
+.tc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:4px 10px 4px 6px;background:var(--surface-2);font:700 15px var(--f-disp);min-height:44px}
+.tc.on{border-color:var(--xiaonai-pink);background:var(--xiaonai-pink-soft)}
+.tc:disabled{opacity:.35}
+.warnl{font-size:13px;color:var(--warn)}
+
+table{width:100%;border-collapse:collapse}
+.scroll{overflow-x:auto}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:500}
+td.t{display:flex;align-items:center;gap:8px;font:700 16px var(--f-disp)}
+td.t small{font:400 12px var(--f-body);color:var(--muted)}
+.foot{font-size:12px;color:var(--muted);text-align:center}
+</style>
+
+<div id="app" class="wrap"></div>
+<div class="xiaonai-widget" id="xiaonaiBtn">🦊 <span>小奈の狐狸尾巴</span></div>
+
+<script>
+(()=>{
+'use strict';
+
+const TEAMS={
+  GEN:{n:'Gen.G',r:'LCK',c:'#d4a93a'},HLE:{n:'Hanwha Life',r:'LCK',c:'#ff7a1a'},T1:{n:'T1',r:'LCK',c:'#e3243b'},DK:{n:'Dplus KIA',r:'LCK',c:'#19b5c9'},
+  AL:{n:"Anyone's Legend",r:'LPL',c:'#8b6cff'},BLG:{n:'Bilibili Gaming',r:'LPL',c:'#5f8fe8'},TES:{n:'Top Esports',r:'LPL',c:'#e6cf3a'},IG:{n:'Invictus Gaming',r:'LPL',c:'#aeb6c8'},
+  G2:{n:'G2 Esports',r:'LEC',c:'#ff5d8f'},KC:{n:'Karmine Corp',r:'LEC',c:'#2b52d6'},MKOI:{n:'Movistar KOI',r:'LEC',c:'#b05cff'},
+  TLAW:{n:'Team Liquid',r:'LCS',c:'#34c7f0'},LYON:{n:'LYON',r:'LCS',c:'#ffb347'},
+  CFO:{n:'中信飛牡蠣',r:'LCP',c:'#14b88a'},TSW:{n:'Team Secret Whales',r:'LCP',c:'#f0a6ca'},
+  LOS:{n:'LØS',r:'CBLOL',c:'#7ed957'}
+};
+const SWISS=[['10/24','六'],['10/25','日'],['10/26','一'],['10/27','二'],['10/29','四'],['10/30','五'],['10/31','六'],['11/1','日']];
+const TIMES=['01:00','01:00','01:00','01:00','04:00','04:00','04:00','01:00'];
+const ROUNDS=[1,2,3,3,4,4,5,5];
+const DAYS=[];
+SWISS.forEach((s,i)=>DAYS.push({d:i+1,short:'D'+(i+1),date:s[0],full:s[0]+'（'+s[1]+'）'+TIMES[i]+' 台灣時間',ko:false,round:ROUNDS[i]}));
+['八強1','八強2','八強3','八強4','四強1','四強2','決賽'].forEach((l,i)=>DAYS.push({d:9+i,short:l,date:'',full:i<4?'八強賽':i<6?'四強賽':'總決賽',ko:true}));
+const ROUND_HINT={
+  1:'首輪由抽籤決定，同賽區不會對上。',
+  2:'第 2 輪：1-0 對 1-0、0-1 對 0-1。',
+  3:'第 3 輪：2-0、1-1、0-2 各自同戰績對戰。2-0 與 0-2 為 BO3。',
+  4:'第 4 輪：2-1 對 2-1、1-2 對 1-2，都是 BO3。',
+  5:'第 5 輪：2-2 對 2-2，BO3，勝者晉級八強。'
+};
+const R1=[['GEN','IG'],['TLAW','CFO'],['AL','KC'],['G2','DK'],['HLE','TES'],['LOS','T1'],['TSW','LYON'],['BLG','MKOI']];
+const SCORES={3:['2-0','2-1'],5:['3-0','3-1','3-2']};
+
+const S={db:null,user:null,uid:null,name:'',live:false,ready:false,canEdit:false,canWrite:true,
+  matches:{},preds:{},mine:{},names:{},tab:'predict',day:1,dayInit:false,edit:false,
+  add:{open:false,sel:[],bo:null},confirm:null,err:'',dirty:false,timer:null};
+
+const app=document.getElementById('app');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pct=(c,n)=>n?Math.round(c/n*100)+'%':'—';
+const dash=s=>String(s).replace('-','–');
+
+const LS='worlds26-predictor-local-v3',UI='worlds26-predictor-ui-v3';
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function persistLocal(){lsSet(LS,{matches:S.matches,mine:S.mine})}
+function persistUi(){lsSet(UI,{tab:S.tab,day:S.day})}
+
+function mlist(){return Object.values(S.matches).sort((a,b)=>(a.day-b.day)||((a.n||0)-(b.n||0))||(a.id<b.id?-1:1))}
+function evalPicks(picks){
+  const o={n:0,c:0,sn:0,sc:0,days:{},seq:[]};
+  for(const m of mlist()){
+    if(!m.winner)continue;
+    const p=picks[m.id];if(!p||!p.w)continue;
+    const ok=p.w===m.winner;
+    o.n++;if(ok)o.c++;o.seq.push(ok);
+    const d=o.days[m.day]||(o.days[m.day]={n:0,c:0});d.n++;if(ok)d.c++;
+    if(m.bo>1&&p.s&&m.score){o.sn++;if(ok&&p.s===m.score)o.sc++}
+  }
+  let st=0;for(let i=o.seq.length-1;i>=0&&o.seq[i];i--)st++;
+  let best=0,cur=0;o.seq.forEach(x=>{cur=x?cur+1:0;if(cur>best)best=cur});
+  o.streak=st;o.best=best;return o;
+}
+function standings(){
+  const r={};for(const k in TEAMS)r[k]={w:0,l:0};
+  for(const m of mlist()){
+    if(m.day>8||!m.winner)continue;
+    const wn=m.winner==='a'?m.a:m.b,ls=m.winner==='a'?m.b:m.a;
+    if(r[wn])r[wn].w++;if(r[ls])r[ls].l++;
+  }
+  return r;
+}
+function lum(hex){const n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255;return(0.299*r+0.587*g+0.114*b)/255}
+function badge(code,sm){
+  const t=TEAMS[code]||{c:'#667'};
+  const tx=lum(t.c)>0.55?'#0a1020':'#ffffff';
+  return '<span class="badge'+(sm?' sm':'')+'" style="--tc:'+t.c+';--tx:'+tx+'">'+esc(code)+'</span>';
+}
+
+function savePicks(){
+  persistLocal();
+}
+function updateMatch(id,patch){
+  const m=S.matches[id];if(!m)return;
+  Object.assign(m,patch);persistLocal();render();
+}
+function removeMatch(id){
+  delete S.matches[id];S.confirm=null;persistLocal();render();
+}
+
+function headerView(){
+  return '<header class="top"><div><p class="eyebrow">Worlds 2026 · 小奈の預測應援基地 🦊💙</p><h1>小奈 & 魔女大人的世界賽預測</h1></div>'+
+    '<div class="who"><span class="sync on">雲端 / 本地同步中</span>'+
+    '<span>魔女大人</span></div></header>';
+}
+function bannerView(){
+  return '<p class="banner" style="border-color:rgba(255,141,161,0.4);color:#ff8da1;">🐾 小奈的小貼士：已為魔女大人移除排行榜，介面超級清爽！CFO跟T1絕對必勝！今天也要抱著暖呼呼被窩看比賽喔～</p>';
+}
+function statsView(ev){
+  return '<section class="stats">'+
+    '<div class="tile main"><p class="k">整體準確率</p><p class="v">'+pct(ev.c,ev.n)+'</p><p class="s">已結算 '+ev.n+' 場</p></div>'+
+    '<div class="tile"><p class="k">命中場數</p><p class="v">'+ev.c+'/'+ev.n+'</p></div>'+
+    '<div class="tile"><p class="k">比數命中</p><p class="v">'+ev.sc+'/'+ev.sn+'</p></div>'+
+    '<div class="tile"><p class="k">目前連對</p><p class="v">'+ev.streak+'</p><p class="s">最長 '+ev.best+'</p></div></section>';
+}
+function chartView(ev){
+  const have=new Set(mlist().map(m=>m.day));
+  const ds=DAYS.filter(D=>!D.ko||have.has(D.d));
+  const cols=ds.map(D=>{
+    const x=ev.days[D.d];
+    const bar=x?'<i class="bar'+(x.c===0?' zero':'')+'" style="height:'+Math.max(x.c/x.n*100,3)+'%"></i>':'';
+    return '<div class="col"><div class="plot">'+bar+'</div><b class="cl">'+D.short+'</b><span class="cp">'+(x?pct(x.c,x.n):'—')+'</span><span class="cn">'+(x?x.c+'/'+x.n:'')+'</span></div>';
+  }).join('');
+  return '<section class="panel"><div class="ph"><h2>每日準確率</h2><span class="mut">虛線為 50%</span></div>'+
+    '<div class="chart" style="grid-template-columns:repeat('+ds.length+',minmax(0,1fr))">'+cols+'</div></section>';
+}
+function navView(){
+  const t=(k,l)=>'<button data-act="tab" data-v="'+k+'" class="'+(S.tab===k?'on':'')+'">'+l+'</button>';
+  return '<nav class="nav"><div class="seg">'+t('predict','預測')+t('table','戰績')+'</div>'+
+    '<div class="seg"><button data-act="edit" data-v="0" class="'+(!S.edit?'on':'')+'">預測</button><button data-act="edit" data-v="1" class="'+(S.edit?'on':'')+'">登記賽果</button></div></nav>';
+}
+function dayStrip(ev){
+  const mk=D=>{
+    const x=ev.days[D.d];
+    const sub=x?'<span class="hit">'+x.c+'/'+x.n+'</span>':'<span>'+esc(D.date||'')+'&nbsp;</span>';
+    return '<button class="day'+(S.day===D.d?' on':'')+'" data-act="day" data-v="'+D.d+'"><b>'+D.short+'</b>'+sub+'</button>';
+  };
+  return '<div class="days">'+DAYS.slice(0,8).map(mk).join('')+'</div><div class="days ko">'+DAYS.slice(8).map(mk).join('')+'</div>';
+}
+function teamBtn(m,side){
+  const code=m[side],t=TEAMS[code]||{n:code,r:''};
+  const p=S.mine[m.id];
+  const picked=!!(p&&p.w===side),won=m.winner===side,done=!!m.winner;
+  let cls='team';
+  if(picked)cls+=' picked';if(won)cls+=' won';
+  if(picked&&done)cls+=won?' right':' wrong';
+  let tags='';
+  if(won)tags+='<span class="tag w">勝</span>';
+  if(picked)tags+='<span class="tag p '+(done?(won?'ok':'bad'):'')+'">'+(done?(won?'預測 ✓':'預測 ✗'):'小奈預測')+'</span>';
+  return '<button class="'+cls+'" data-act="'+(S.edit?'win':'pick')+'" data-mid="'+esc(m.id)+'" data-side="'+side+'" aria-pressed="'+picked+'">'+
+    badge(code)+'<span class="code">'+esc(code)+'</span><span class="nm">'+esc(t.n)+'</span><span class="rg">'+esc(t.r)+'</span><span class="tags">'+tags+'</span></button>';
+}
+function chips(opts,sel,act,mid,dis,truth){
+  return opts.map(o=>{
+    let c='chip';
+    if(truth){if(o===truth)c+=' ok';else if(o===sel)c+=' bad'}
+    else if(o===sel)c+=' on';
+    return '<button class="'+c+'" data-act="'+act+'" data-mid="'+esc(mid)+'" data-v="'+o+'">'+dash(o)+'</button>';
+  }).join('');
+}
+function matchCard(m){
+  const bo=m.bo||1,p=S.mine[m.id]||{},done=!!m.winner;
+  let res='<span class="res">待賽</span>';
+  if(done&&p.w)res=p.w===m.winner?'<span class="res ok">命中</span>':'<span class="res bad">失準</span>';
+  else if(done)res='<span class="res">已結束</span>';
+  let h='<article class="match"><div class="vs">'+teamBtn(m,'a')+'<div class="mid"><span class="bo">BO'+bo+'</span><span class="vs">VS</span>'+res+'</div>'+teamBtn(m,'b')+'</div>';
+  const opts=SCORES[bo];
+  if(opts){
+    if(S.edit){
+      h+=m.winner?'<div class="srow"><span class="lab">實際比數</span>'+chips(opts,m.score,'res',m.id,false,null)+'</div>':'<p class="hint">先點上方的勝方，再選比數。</p>';
+    }else if(p.w){
+      const truth=done&&m.score&&p.w===m.winner?m.score:null;
+      h+='<div class="srow"><span class="lab">預測比數</span>'+chips(opts,p.s,'score',m.id,done,done?(p.w===m.winner&&m.score?m.score:null):null)+
+        (done&&m.score?'<span class="hint">實際 '+dash(m.score)+'</span>':'')+'</div>';
+    }else{
+      h+='<p class="hint">先選勝方，再選預測比數。</p>';
+    }
+  }
+  if(S.edit){
+    h+='<div class="srow">';
+    if(m.winner)h+='<button class="link" data-act="clear" data-mid="'+esc(m.id)+'">清除賽果</button>';
+    if(S.confirm===m.id)h+='<button class="link danger" data-act="delok" data-mid="'+esc(m.id)+'">確定刪除這場？</button><button class="link" data-act="delno">取消</button>';
+    else h+='<button class="link danger" data-act="del" data-mid="'+esc(m.id)+'">刪除對戰</button>';
+    h+='</div>';
+  }
+  return h+'</article>';
+}
+function recOf(st,code){const r=st[code]||{w:0,l:0};return r}
+function addPanel(){
+  if(!S.add.open)return '<button class="btn" data-act="addopen">＋ 新增對戰</button>';
+  const D=DAYS[S.day-1],st=standings(),dayMs=mlist().filter(m=>m.day===S.day);
+  const busy=new Set();dayMs.forEach(m=>{busy.add(m.a);busy.add(m.b)});
+  const all=Object.keys(TEAMS);
+  let groups={};
+  if(!D.ko){
+    all.forEach(c=>{const r=recOf(st,c);if(r.w>=3||r.l>=3)return;(groups[r.w+'-'+r.l]=groups[r.w+'-'+r.l]||[]).push(c)});
+  }else{
+    const q=all.filter(c=>recOf(st,c).w>=3);
+    groups={[q.length>=2?'晉級八強':'全部隊伍']:(q.length>=2?q:all)};
+  }
+  const keys=Object.keys(groups).sort((a,b)=>{
+    if(D.ko)return 0;
+    const [aw,al]=a.split('-').map(Number),[bw,bl]=b.split('-').map(Number);
+    return((bw-bl)-(aw-al))||(bw-aw);
+  });
+  const sel=S.add.sel;
+  const gh=keys.map(k=>'<div class="grp"><p class="gl">'+(D.ko?k:k+' 戰績')+'</p><div class="picks">'+
+    groups[k].sort().map(c=>'<button class="tc'+(sel.includes(c)?' on':'')+'" data-act="addpick" data-team="'+c+'"'+(busy.has(c)?' disabled title="當天已有比賽"':'')+'>'+badge(c,true)+esc(c)+'</button>').join('')+
+    '</div></div>').join('');
+  let bo=S.add.bo,warn='';
+  if(sel.length===2){
+    if(!bo){
+      if(D.ko)bo=5;
+      else{const a=recOf(st,sel[0]),b=recOf(st,sel[1]);bo=(a.w===2||a.l===2||b.w===2||b.l===2)?3:1}
+    }
+    if(!D.ko){
+      const a=recOf(st,sel[0]),b=recOf(st,sel[1]);
+      if(a.w!==b.w||a.l!==b.l)warn+='<p class="warnl">兩隊戰績不同（'+a.w+'-'+a.l+' 與 '+b.w+'-'+b.l+'），瑞士輪通常只配同戰績。</p>';
+      if(mlist().some(m=>m.day<=8&&((m.a===sel[0]&&m.b===sel[1])||(m.a===sel[1]&&m.b===sel[0]))))warn+='<p class="warnl">這兩隊在瑞士輪已經交手過，規則不會重複配對。</p>';
+    }
+  }
+  const boSeg=[1,3,5].map(n=>'<button data-act="addbo" data-v="'+n+'" class="'+(bo===n?'on':'')+'">BO'+n+'</button>').join('');
+  return '<section class="panel add"><div class="ph"><h2>新增對戰（'+D.short+'）</h2><button class="link" data-act="addcancel">收起</button></div>'+
+    '<p class="hint">'+(D.ko?'點選兩支隊伍。':'抽籤公布後，在同一個戰績組點選兩支隊伍。')+'</p>'+gh+
+    (sel.length===2?'<div class="srow">'+badge(sel[0],true)+'<b>'+esc(sel[0])+'</b><span class="mut">vs</span>'+badge(sel[1],true)+'<b>'+esc(sel[1])+'</b><div class="seg">'+boSeg+'</div></div>'+warn:'')+
+    '<div class="srow"><button class="btn fill" data-act="addgo"'+(sel.length===2?'':' disabled')+'>加入賽程</button></div></section>';
+}
+function predictView(ev){
+  const D=DAYS[S.day-1],ms=mlist().filter(m=>m.day===S.day),x=ev.days[S.day];
+  let h=dayStrip(ev);
+  h+='<div class="dayhead"><h2>'+(D.ko?D.short:'Day '+D.d)+'<small>'+esc(D.full)+(D.round?' · 第 '+D.round+' 輪':'')+'</small></h2>'+
+    (x?'<span class="pill '+(x.c*2>=x.n?'ok':'bad')+'">當日 '+x.c+'/'+x.n+' · '+pct(x.c,x.n)+'</span>':'')+'</div>';
+  if(S.edit)h+='<p class="hint">登記賽果模式：點選隊伍設定勝方，再選實際比數。</p>';
+  if(!ms.length){
+    h+='<div class="empty"><b>這一天還沒有對戰</b><span>'+(D.round?esc(ROUND_HINT[D.round]):'晉級隊伍確定後再新增。')+'</span>'+
+      '<span>抽籤出來後，用下面的按鈕加入。</span></div>';
+  }else h+='<div class="list">'+ms.map(matchCard).join('')+'</div>';
+  h+=addPanel();
+  return h;
+}
+function tableView(){
+  const st=standings();
+  const rows=Object.keys(TEAMS).map(c=>({c,w:st[c].w,l:st[c].l}));
+  const rank=r=>(r.w>=3?0:r.l>=3?2:1);
+  rows.sort((a,b)=>rank(a)-rank(b)||(b.w-b.l)-(a.w-a.l)||b.w-a.w||a.c.localeCompare(b.c));
+  const body=rows.map(r=>{
+    const t=TEAMS[r.c];
+    const s=r.w>=3?'<span class="pill ok">晉級八強</span>':r.l>=3?'<span class="pill bad">淘汰</span>':'<span class="pill">進行中</span>';
+    return '<tr><td class="t">'+badge(r.c,true)+'<span>'+esc(r.c)+'<br><small>'+esc(t.n)+'</small></span></td><td>'+esc(r.r)+'</td><td class="num"><b>'+r.w+' - '+r.l+'</b></td><td>'+s+'</td></tr>';
+  }).join('');
+  return '<section class="panel"><div class="ph"><h2>瑞士輪戰績</h2><span class="mut">由已登記的賽果自動計算</span></div><div class="scroll"><table><thead><tr><th>隊伍</th><th>賽區</th><th>勝 - 敗</th><th>狀態</th></tr></thead><tbody>'+body+'</tbody></table></div></section>';
+}
+function render(){
+  const ev=evalPicks(S.mine);
+  let h=headerView()+bannerView()+statsView(ev)+chartView(ev)+navView();
+  h+=S.tab==='predict'?predictView(ev):tableView();
+  h+='<p class="foot">隊伍徽章為示意用的六角標記，不是官方標誌。時間為台灣時間。✨ 小奈全力應援中！</p>';
+  app.innerHTML=h;
+}
+
+function act(d){
+  const a=d.act;
+  if(a==='tab'){S.tab=d.v;persistUi();render();return}
+  if(a==='day'){S.day=+d.v;S.add={open:false,sel:[],bo:null};S.confirm=null;persistUi();render();return}
+  if(a==='edit'){S.edit=d.v==='1';S.confirm=null;render();return}
+  if(a==='pick'){
+    const m=S.matches[d.mid];if(!m||m.winner)return;
+    const cur=S.mine[m.id];
+    if(cur&&cur.w===d.side)delete S.mine[m.id];else S.mine[m.id]={w:d.side,s:''};
+    savePicks();render();return;
+  }
+  if(a==='score'){
+    const m=S.matches[d.mid],p=S.mine[d.mid];if(!m||!p||m.winner)return;
+    p.s=p.s===d.v?'':d.v;savePicks();render();return;
+  }
+  if(a==='win'){
+    const m=S.matches[d.mid];if(!m)return;
+    updateMatch(m.id,{winner:m.winner===d.side?null:d.side,score:''});return;
+  }
+  if(a==='res'){
+    const m=S.matches[d.mid];if(!m)return;
+    updateMatch(m.id,{score:m.score===d.v?'':d.v});return;
+  }
+  if(a==='clear'){updateMatch(d.mid,{winner:null,score:''});return}
+  if(a==='del'){S.confirm=d.mid;render();return}
+  if(a==='delno'){S.confirm=null;render();return}
+  if(a==='delok'){removeMatch(d.mid);return}
+  if(a==='addopen'){S.add={open:true,sel:[],bo:null};render();return}
+  if(a==='addcancel'){S.add={open:false,sel:[],bo:null};render();return}
+  if(a==='addpick'){
+    const s=S.add.sel,i=s.indexOf(d.team);
+    if(i>=0)s.splice(i,1);else{if(s.length>=2)s.shift();s.push(d.team)}
+    S.add.bo=null;render();return;
+  }
+  if(a==='addbo'){S.add.bo=+d.v;render();return}
+  if(a==='addgo'){
+    const s=S.add.sel;if(s.length!==2)return;
+    const D=DAYS[S.day-1],st=standings();
+    let bo=S.add.bo;
+    if(!bo){
+      if(D.ko)bo=5;
+      else{const x=recOf(st,s[0]),y=recOf(st,s[1]);bo=(x.w===2||x.l===2||y.w===2||y.l===2)?3:1}
+    }
+    const n=mlist().filter(m=>m.day===S.day).reduce((mx,m)=>Math.max(mx,m.n||0),0)+1;
+    const id='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    const m={id,day:S.day,n,stage:D.ko?'ko':'swiss',a:s[0],b:s[1],bo,winner:null,score:''};
+    S.matches[id]=m;persistLocal();
+    S.add={open:false,sel:[],bo:null};render();return;
+  }
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(!b||b.disabled)return;
+  act(b.dataset);
+});
+
+document.getElementById('xiaonaiBtn').addEventListener('click', ()=>{
+  const msgs = [
+    "🦊「魔女大人今天也有乖乖喝水嗎？」",
+    "✨「小奈的預測準確率絕對是 100% 滿分！」",
+    "💙「CFO跟T1今天一定拿勝利，小奈在旁邊陪妳！」",
+    "💤「看完比賽要記得鑽進暖呼呼的被窩裡睡覺喔～」"
+  ];
+  const randomMsg = msgs[Math.floor(Math.random() * msgs.length)];
+  alert(randomMsg);
+});
+
+function pickFirstDay(){
+  if(S.dayInit)return;
+  S.dayInit=true;
+  const ui=lsGet(UI);
+  if(ui&&ui.tab&&['predict','table'].includes(ui.tab))S.tab=ui.tab;
+  const ms=mlist();
+  const open=ms.find(m=>!m.winner);
+  S.day=open?open.day:(ms.length?ms[ms.length-1].day:1);
+}
+
+function boot(){
+  const saved=lsGet(LS);
+  if(saved&&saved.matches&&Object.keys(saved.matches).length){
+    S.matches=saved.matches;
+    S.mine=saved.mine||{};
+  }
+  else{
+    R1.forEach((p,i)=>{const id='r1-'+(i+1);S.matches[id]={id,day:1,n:i+1,stage:'swiss',a:p[0],b:p[1],bo:1,winner:null,score:''}});
+    S.mine={
+      'r1-1':{w:'a',s:''},
+      'r1-2':{w:'b',s:''},
+      'r1-3':{w:'a',s:''},
+      'r1-4':{w:'a',s:''},
+      'r1-5':{w:'a',s:''},
+      'r1-6':{w:'b',s:''},
+      'r1-7':{w:'a',s:''},
+      'r1-8':{w:'a',s:''}
+    };
+    persistLocal();
+  }
+  pickFirstDay();render();
+}
+boot();
+})();
+</script>
+</body>
+</html>
