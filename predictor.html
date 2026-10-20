@@ -147,6 +147,10 @@ td.t small{font:400 12px var(--f-body);color:var(--muted)}
 .meter{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:60px}
 .meter i{display:block;height:100%;background:var(--gold)}
 .foot{font-size:12px;color:var(--muted);text-align:center}
+.foot a{color:var(--muted);text-decoration:underline}
+.nick{background:var(--surface-2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:14px var(--f-body);width:150px;min-height:40px}
+.nickbtn{border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-height:36px;font-size:13px;color:var(--muted);background:var(--surface)}
+.nickbtn.has{color:var(--fg)}
 .sharetxt{width:100%;min-height:200px;background:var(--surface-2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:14px/1.6 var(--f-body);resize:vertical}
 .shareimg{display:block;width:100%;max-width:420px;border-radius:10px;border:1px solid var(--line)}
 .smsg{font-size:13px;color:var(--ok);min-height:20px}
@@ -224,7 +228,7 @@ const R1=[['GEN','IG'],['TLAW','CFO'],['AL','KC'],['G2','DK'],['HLE','TES'],['LO
 const SCORES={3:['2-0','2-1'],5:['3-0','3-1','3-2']};
 
 const S={db:null,user:null,uid:null,name:'',live:false,ready:false,canEdit:false,canWrite:true,
-  matches:{},mine:{},favs:[],favEdit:false,shareMode:'result',shareImg:null,shareBlob:null,dl:null,tab:'predict',day:1,dayInit:false,edit:false,
+  matches:{},mine:{},favs:[],favEdit:false,shareMode:'result',pend:null,nick:'',nickEdit:false,shareImg:null,shareBlob:null,dl:null,tab:'predict',day:1,dayInit:false,edit:false,
   add:{open:false,sel:[],bo:null},confirm:null,err:'',dirty:false,timer:null};
 
 const app=document.getElementById('app');
@@ -236,7 +240,7 @@ const dash=s=>String(s).replace('-','–');
 const LS='worlds26-predictor-local-v1',UI='worlds26-predictor-ui-v1';
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-function persistLocal(){lsSet(LS,{matches:S.matches,mine:S.mine,favs:S.favs})}
+function persistLocal(){lsSet(LS,{matches:S.matches,mine:S.mine,favs:S.favs,nick:S.nick})}
 function persistUi(){lsSet(UI,{tab:S.tab,day:S.day})}
 
 /* ---------- data helpers ---------- */
@@ -279,7 +283,7 @@ function savePicks(){
   S.timer=setTimeout(()=>{
     if(!S.db||!S.uid){S.dirty=false;return}
     queue(async()=>{
-      await S.db.doc('data/users/'+S.uid+'/picks').set({picks:S.mine,favs:S.favs,matches:S.matches});
+      await S.db.doc('data/users/'+S.uid+'/picks').set({picks:S.mine,favs:S.favs,matches:S.matches,nick:S.nick});
       S.dirty=false;
     });
   },300);
@@ -306,12 +310,12 @@ function stageNow(){
 }
 function headerView(){
   return '<header class="top"><div><p class="eyebrow">Worlds 2026 · '+stageNow()[0]+'</p><h1>世界賽預測表</h1></div>'+
-    '<div class="who"><span class="sync'+(S.live?' on':'')+'">'+(S.live?'帳號同步':'只存在這個瀏覽器')+'</span>'+
-    '<span>'+esc(S.name||(S.live?'已登入':'未登入'))+'</span></div></header>';
+    '<div class="who">'+(S.nickEdit?
+      '<input class="nick" id="nickin" maxlength="12" placeholder="你的暱稱" value="'+esc(S.nick)+'"><button class="link" data-act="nicksave">儲存</button>':
+      '<button class="nickbtn'+(S.nick?' has':'')+'" data-act="nickedit">'+(S.nick?esc(S.nick):'設定暱稱')+'</button>')+'</div></header>';
 }
 function bannerView(){
   let h='';
-  if(!S.live&&S.ready)h+='<p class="banner">這張表是你自己的：對戰、賽果、預測都由你填，別人看不到。沒登入時資料只存在這個瀏覽器，清除瀏覽資料或換裝置就會消失。</p>';
   if(S.err)h+='<p class="banner warn">'+esc(S.err)+'</p>';
   return h;
 }
@@ -599,17 +603,18 @@ function sharePickLine(m,p){
   const mk=m.winner?(p.w===m.winner?' ✓':' ✗'):'';
   return w+' 勝 '+l+(p.s?'（'+dash(p.s)+'）':'')+mk;
 }
+function nm(){return S.nick?S.nick+' 的':'我的'}
 function shareText(ev){
   const st=standings(),L=[];
   if(S.shareMode==='picks'){
-    L.push('我的世界賽 2026 預測');
+    L.push(nm()+'世界賽 2026 預測');
     const byDay={};
     mlist().forEach(m=>{const p=S.mine[m.id];if(p&&p.w)(byDay[m.day]=byDay[m.day]||[]).push(sharePickLine(m,p))});
     const ds=DAYS.filter(D=>byDay[D.d]);
     if(!ds.length)L.push('還沒有預測。');
     ds.forEach(D=>{L.push('');L.push(D.short+(D.date?'（'+D.date+'）':''));byDay[D.d].forEach(x=>L.push(x))});
   }else{
-    L.push('我的世界賽 2026 預測戰績');
+    L.push(nm()+'世界賽 2026 預測戰績');
     if(ev.n){
       L.push('命中 '+ev.c+'/'+ev.n+'（'+pct(ev.c,ev.n)+'）');
       if(ev.sn)L.push('比數命中 '+ev.sc+'/'+ev.sn);
@@ -619,6 +624,29 @@ function shareText(ev){
     if(S.favs.length)L.push('本命：'+S.favs.map(c=>c+'（'+teamStatus(c,st).lab+'）').join('、'));
   }
   return L.join('\n');
+}
+function backupCode(){
+  return 'W26:'+btoa(unescape(encodeURIComponent(JSON.stringify({v:1,matches:S.matches,mine:S.mine,favs:S.favs,nick:S.nick}))));
+}
+function parseBackup(raw){
+  try{
+    const t=String(raw||'').replace(/\s+/g,'');
+    if(t.indexOf('W26:')!==0)return null;
+    const o=JSON.parse(decodeURIComponent(escape(atob(t.slice(4)))));
+    if(!o||typeof o.matches!=='object'||!o.matches||typeof o.mine!=='object'||!o.mine||!Array.isArray(o.favs))return null;
+    return o;
+  }catch(e){return null}
+}
+function backupView(){
+  const pend=S.pend;
+  return '<section class="panel"><div class="ph"><h2>換裝置與備份</h2></div>'+
+    '<p class="hint">資料存在目前這個瀏覽器。換手機或電腦時，用備份碼搬過去：先在舊裝置按「複製備份碼」，傳給自己（例如 LINE 的記事本），再到新裝置貼進下面的框，按「還原」。</p>'+
+    '<textarea class="sharetxt" id="backuptxt" readonly style="min-height:96px">'+esc(backupCode())+'</textarea>'+
+    '<div class="srow"><button class="btn fill" data-act="bcopy">複製備份碼</button><span class="smsg" id="smsg3"></span></div>'+
+    '<textarea class="sharetxt" id="restoretxt" placeholder="在這裡貼上備份碼" style="min-height:96px"></textarea>'+
+    (pend?'<p class="hint">會用備份碼的內容取代這台裝置目前的資料（對戰 '+Object.keys(pend.matches).length+' 場、預測 '+Object.keys(pend.mine).length+' 筆、本命 '+pend.favs.length+' 隊），確定嗎？</p><div class="srow"><button class="btn fill" data-act="restoreok">確定還原</button><button class="link" data-act="restoreno">取消</button></div>'
+         :'<div class="srow"><button class="btn" data-act="restore">還原</button><span class="smsg" id="smsg4" style="color:var(--warn)"></span></div>')+
+    '</section>';
 }
 function shareView(ev){
   const mb=(k,l)=>'<button data-act="smode" data-v="'+k+'" class="'+(S.shareMode===k?'on':'')+'">'+l+'</button>';
@@ -630,7 +658,7 @@ function shareView(ev){
     '<div class="srow"><button class="btn'+(S.shareImg?'':' fill')+'" data-act="mkimg">'+(S.shareImg?'重新產生':'產生圖片')+'</button>'+
     (S.shareImg&&S.dl?'<button class="btn fill" data-act="saveimg">存成圖片</button>':'')+'<span class="smsg" id="smsg2"></span></div>'+
     (S.shareImg?'<img class="shareimg" src="'+S.shareImg+'" alt="我的世界賽預測戰績卡"><p class="hint">手機也可以長按圖片儲存。</p>':'')+'</section>';
-  return h;
+  return h+backupView();
 }
 function hexPath(x,l,t,w,h){
   x.beginPath();x.moveTo(l+w*.25,t+h*.03);x.lineTo(l+w*.75,t+h*.03);x.lineTo(l+w,t+h*.5);
@@ -640,7 +668,7 @@ function roundRect(x,l,t,w,h,r){
   x.beginPath();x.moveTo(l+r,t);x.arcTo(l+w,t,l+w,t+h,r);x.arcTo(l+w,t+h,l,t+h,r);x.arcTo(l,t+h,l,t,r);x.arcTo(l,t,l+w,t,r);x.closePath();
 }
 async function drawCard(ev){
-  try{await Promise.all([document.fonts.load('700 100px "Barlow Condensed"','0123456789%'),document.fonts.load('700 40px "Noto Sans TC"','我的世界賽預測表準確率命中連對本命晉級八強四強總決賽冠軍亞軍淘汰止步瑞士輪每日比數最長目前場'),document.fonts.load('500 30px "Noto Sans TC"','我的世界賽預測表準確率命中連對本命')])}catch(e){}
+  try{await Promise.all([document.fonts.load('700 100px "Barlow Condensed"','0123456789%'),document.fonts.load('700 40px "Noto Sans TC"','我的世界賽預測表準確率命中連對本命晉級八強四強總決賽冠軍亞軍淘汰止步瑞士輪每日比數最長目前場'+S.nick),document.fonts.load('500 30px "Noto Sans TC"','我的世界賽預測表準確率命中連對本命')])}catch(e){}
   const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const x=cv.getContext('2d');
   const F='"Barlow Condensed","Noto Sans TC",sans-serif',B='"Noto Sans TC",system-ui,sans-serif';
@@ -648,7 +676,7 @@ async function drawCard(ev){
   x.fillStyle='#0a1020';x.fillRect(0,0,W,H);
   x.textBaseline='alphabetic';x.textAlign='left';
   x.fillStyle=gold;x.font='600 34px '+F;x.fillText('WORLDS 2026 · '+stageNow()[1].toUpperCase(),72,110);
-  x.fillStyle=fg;x.font='700 76px '+B;x.fillText('我的世界賽預測',72,204);
+  x.fillStyle=fg;x.font='700 76px '+B;x.fillText((S.nick||'我')+'的世界賽預測',72,204);
   x.fillStyle=gold;x.font='700 330px '+F;x.fillText(ev.n?pct(ev.c,ev.n):'—',72,520);
   x.fillStyle=mut;x.font='500 36px '+B;x.fillText('整體準確率 · 命中 '+ev.c+'/'+ev.n+' 場',72,584);
   [['比數命中',ev.sc+'/'+ev.sn],['目前連對',String(ev.streak)],['最長連對',String(ev.best)]].forEach((b,i)=>{
@@ -689,7 +717,7 @@ function render(){
   const ev=evalPicks(S.mine);
   let h=headerView()+bannerView()+cdView()+statsView(ev)+favView()+chartView(ev)+navView();
   h+=S.tab==='predict'?predictView(ev):S.tab==='table'?tableView():S.tab==='recap'?recapView(ev):shareView(ev);
-  h+='<p class="foot">隊伍徽章為示意用的六角標記，不是官方標誌。時間為台灣時間。</p>';
+  h+='<p class="foot">隊伍徽章為示意用的六角標記，不是官方標誌。時間為台灣時間。</p><p class="foot">作者：<a href="https://www.plurk.com/the_ice" target="_blank" rel="noopener noreferrer">悠月</a> · 由 Claude 製作</p>';
   h+=S.resetAsk?'<p class="foot">會清掉所有預測、賽果和本命隊伍，無法復原。<button class="link danger" data-act="resetok">確定清除</button><button class="link" data-act="resetno">取消</button></p>':'<p class="foot"><button class="link" data-act="reset">重設我的全部資料</button></p>';
   app.innerHTML=h;
   checkFav();
@@ -729,6 +757,28 @@ function act(d){
     S.resetAsk=false;S.matches=seedMatches();S.mine={};S.favs=[];S.day=1;S.edit=false;S.add={open:false,sel:[],bo:null};
     try{localStorage.removeItem(SEEN)}catch(e){}
     savePicks();render();return;
+  }
+  if(a==='nickedit'){S.nickEdit=true;render();setTimeout(()=>{const e=document.getElementById('nickin');if(e){e.focus();e.select()}},0);return}
+  if(a==='nicksave'){
+    const e=document.getElementById('nickin');
+    S.nick=((e&&e.value)||'').trim().slice(0,12);S.nickEdit=false;S.shareImg=null;savePicks();render();return;
+  }
+  if(a==='bcopy'){
+    const t=backupCode(),note=m=>{const e=document.getElementById('smsg3');if(e)e.textContent=m};
+    const fb=()=>{const ta=document.getElementById('backuptxt');if(ta){ta.focus();ta.select()}note('無法自動複製，已選取備份碼，請長按後複製。')};
+    try{navigator.clipboard.writeText(t).then(()=>note('已複製備份碼。'),fb)}catch(e){fb()}
+    return;
+  }
+  if(a==='restore'){
+    const ta=document.getElementById('restoretxt'),o=parseBackup(ta&&ta.value);
+    if(!o){const m=document.getElementById('smsg4');if(m)m.textContent='備份碼無法讀取，請確認有完整貼上。';return}
+    S.pend=o;render();return;
+  }
+  if(a==='restoreno'){S.pend=null;render();return}
+  if(a==='restoreok'){
+    const o=S.pend;if(!o)return;
+    S.matches=JSON.parse(JSON.stringify(o.matches));S.mine=JSON.parse(JSON.stringify(o.mine));S.favs=o.favs.slice();if(typeof o.nick==='string')S.nick=o.nick.slice(0,12);
+    S.pend=null;S.dayInit=false;pickFirstDay();savePicks();render();return;
   }
   if(a==='smode'){S.shareMode=d.v;render();return}
   if(a==='copy'){
@@ -778,6 +828,9 @@ function act(d){
     S.add={open:false,sel:[],bo:null};render();return;
   }
 }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target&&e.target.id==='nickin')act({act:'nicksave'});
+});
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');
   if(!b||b.disabled)return;
@@ -800,6 +853,7 @@ async function boot(){
   const saved=lsGet(LS);
   if(saved&&saved.matches&&Object.keys(saved.matches).length){S.matches=saved.matches;S.mine=saved.mine||{};S.favs=saved.favs||[]}
   else{S.matches=seedMatches();S.mine=(saved&&saved.mine)||{};S.favs=(saved&&saved.favs)||[];persistLocal()}
+  S.nick=(saved&&saved.nick)||'';
   S.ready=true;pickFirstDay();render();
   let db=null,user=null,cloud=false;
   try{if(c&&c.use){const r=await Promise.all([c.use('db'),c.use('user'),c.use('downloads')]);db=r[0];user=r[1];S.dl=r[2]}}catch(e){}
@@ -818,6 +872,7 @@ async function boot(){
       if(x&&!S.dirty){
         S.mine=JSON.parse(JSON.stringify(x.picks||{}));
         S.favs=Array.isArray(x.favs)?x.favs.slice():[];
+        if(typeof x.nick==='string')S.nick=x.nick;
         if(x.matches&&Object.keys(x.matches).length)S.matches=JSON.parse(JSON.stringify(x.matches));
       }
       if(first){first=false;S.dayInit=false;pickFirstDay();if(!x||!x.matches)savePicks()}
