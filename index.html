@@ -1,4 +1,4 @@
-<!doctype html>
+html_content = """<!doctype html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
@@ -317,7 +317,6 @@ function headerView(){
 }
 function bannerView(){
   let h='<p class="banner">✨ 小奈已經把第一天的預測魔法寫進程式碼裡囉！快看看小奈的獨家預測吧！💜</p>';
-  if(!S.live&&S.ready)h+='<p class="banner">這張表是你自己的：對戰、賽果、預測都由你填，別人看不到。沒登入時資料只存在這個瀏覽器，清除瀏覽資料或換裝置就會消失。</p>';
   if(S.err)h+='<p class="banner warn">'+esc(S.err)+'</p>';
   return h;
 }
@@ -802,16 +801,18 @@ async function boot(){
   const c=window.claude;
   S.canEdit=true;S.canWrite=true;
   const saved=lsGet(LS);
-  if(saved&&saved.matches&&Object.keys(saved.matches).length){
-    S.matches=saved.matches;
-    S.mine=saved.mine||JSON.parse(JSON.stringify(XIAONAI_PREDS));
-    S.favs=saved.favs||[];
-  }else{
-    S.matches=seedMatches();
-    S.mine=JSON.parse(JSON.stringify(XIAONAI_PREDS));
-    S.favs=(saved&&saved.favs)||[];
-    persistLocal();
+  let matches = saved && saved.matches ? saved.matches : {};
+  const defaultMatches = seedMatches();
+  for(const k in defaultMatches){
+    if(!matches[k]){
+      matches[k] = defaultMatches[k];
+    }
   }
+  S.matches = matches;
+  S.mine = (saved && saved.mine && Object.keys(saved.mine).length) ? saved.mine : JSON.parse(JSON.stringify(XIAONAI_PREDS));
+  S.favs = (saved && saved.favs) || [];
+  persistLocal();
+
   S.ready=true;pickFirstDay();render();
   let db=null,user=null,cloud=false;
   try{if(c&&c.use){const r=await Promise.all([c.use('db'),c.use('user'),c.use('downloads')]);db=r[0];user=r[1];S.dl=r[2]}}catch(e){}
@@ -848,3 +849,8 @@ setInterval(()=>{
 
 </body>
 </html>
+"""
+
+with open('worlds2026-predictor.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+print("File updated successfully.")
