@@ -650,7 +650,7 @@ function backupView(){
 }
 function shareView(ev){
   const mb=(k,l)=>'<button data-act="smode" data-v="'+k+'" class="'+(S.shareMode===k?'on':'')+'">'+l+'</button>';
-  let h='<section class="panel"><div class="ph"><h2>分享文字</h2><span class="mut">貼到 LINE 或社群，不含你的名字</span></div>'+
+  let h='<section class="panel"><div class="ph"><h2>分享文字</h2><span class="mut">貼到 LINE 或社群</span></div>'+
     '<div class="seg">'+mb('result','我的戰績')+mb('picks','我的預測')+'</div>'+
     '<textarea class="sharetxt" id="sharetxt" readonly>'+esc(shareText(ev))+'</textarea>'+
     '<div class="srow"><button class="btn fill" data-act="copy">複製文字</button><span class="smsg" id="smsg"></span></div></section>';
