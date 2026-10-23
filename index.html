@@ -1,4 +1,4 @@
-html_content = """<!doctype html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
@@ -242,7 +242,8 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const pct=(c,n)=>n?Math.round(c/n*100)+'%':'—';
 const dash=s=>String(s).replace('-','–');
 
-const LS='worlds26-predictor-local-v1',UI='worlds26-predictor-ui-v1';
+// 獨立的小奈專屬存檔 Key
+const LS='worlds26-xiaonai-local-v1',UI='worlds26-xiaonai-ui-v1';
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function persistLocal(){lsSet(LS,{matches:S.matches,mine:S.mine,favs:S.favs})}
@@ -301,7 +302,13 @@ function removeMatch(id){
 }
 function seedMatches(){
   const o={};
-  R1.forEach((p,i)=>{const id='r1-'+(i+1);o[id]={id,day:1,n:i+1,stage:'swiss',a:p[0],b:p[1],bo:1,winner:null,score:''}});
+  R1.forEach((p,i)=>{
+    const id='r1-'+(i+1);
+    let winner=null;
+    if(i===0) winner='a'; // GEN vs IG -> GEN贏
+    if(i===4) winner='a'; // HLE vs TES -> HLE贏
+    o[id]={id,day:1,n:i+1,stage:'swiss',a:p[0],b:p[1],bo:1,winner:winner,score:''};
+  });
   return o;
 }
 
@@ -460,7 +467,7 @@ function predictView(ev){
   if(!S.ready)h+='<div class="empty">正在載入對戰…</div>';
   else if(!ms.length){
     h+='<div class="empty"><b>這一天還沒有對戰</b><span>'+(D.round?esc(ROUND_HINT[D.round]):'晉級隊伍確定後再新增。')+'</span>'+
-      (S.canEdit?'<span>抽籤出來後，用下面的按鈕加入。</span>':'<span>主辦人加入對戰後會顯示在這裡。</span>')+'</div>';
+      (S.canEdit?'<span>抽籤出來後，用下面的按鈕加入。</span>':'<span>主辦人加入對戰後會顯示在這裡。')+'</div>';
   }else h+='<div class="list">'+ms.map(matchCard).join('')+'</div>';
   h+=addPanel();
   return h;
@@ -849,8 +856,3 @@ setInterval(()=>{
 
 </body>
 </html>
-"""
-
-with open('worlds2026-predictor.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-print("File updated successfully.")
