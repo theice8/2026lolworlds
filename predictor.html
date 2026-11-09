@@ -54,12 +54,12 @@ h1{font-family:var(--f-disp);font-size:38px;line-height:1.05;font-weight:700;tex
 h2{font-size:16px;font-weight:700}
 .chart{display:grid;gap:6px}
 .col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
-.plot{position:relative;width:100%;height:100px;border-bottom:1px solid var(--line)}
+.plot{position:relative;width:100%;height:80px;border-bottom:1px solid var(--line)}
 .plot::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px dashed var(--line)}
 .bar{position:absolute;left:18%;right:18%;bottom:0;background:var(--gold);border-radius:3px 3px 0 0}
 .bar.zero{background:var(--bad)}
-.cl{font:600 14px var(--f-disp);margin-top:4px}
-.cp{font-size:12px;font-variant-numeric:tabular-nums}
+.cl{font:600 14px var(--f-disp);margin-top:4px;white-space:nowrap}
+.cp{font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .cn{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:16px}
 
 .nav{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
@@ -147,6 +147,18 @@ td.t small{font:400 12px var(--f-body);color:var(--muted)}
 .meter{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:60px}
 .meter i{display:block;height:100%;background:var(--gold)}
 .foot{font-size:12px;color:var(--muted);text-align:center}
+.kmatch{display:grid;grid-template-columns:50px minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.kmatch:last-child{border-bottom:0}
+.kd{font:600 13px var(--f-disp);color:var(--muted);white-space:nowrap}
+.kt{display:flex;gap:6px;align-items:center;min-width:0;font:700 17px var(--f-disp)}
+.kt.r{justify-content:flex-end}
+.kt.w{color:var(--ok)}
+.kt.l{opacity:.5}
+.kt.l .badge{filter:grayscale(1)}
+.ks{font:700 15px var(--f-disp);color:var(--muted);text-align:center;min-width:38px;font-variant-numeric:tabular-nums}
+.ks.done{color:var(--fg)}
+.champ{border-color:var(--gold);background:var(--gold-soft);align-items:center;text-align:center}
+.champ h2{font:700 28px/1.2 var(--f-disp);color:var(--gold)}
 .foot a{color:var(--muted);text-decoration:underline}
 .nick{background:var(--surface-2);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font:14px var(--f-body);width:150px;min-height:40px}
 .nickbtn{border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-height:36px;font-size:13px;color:var(--muted);background:var(--surface)}
@@ -326,16 +338,19 @@ function statsView(ev){
     '<div class="tile"><p class="k">比數命中</p><p class="v">'+ev.sc+'/'+ev.sn+'</p></div>'+
     '<div class="tile"><p class="k">目前連對</p><p class="v">'+ev.streak+'</p><p class="s">最長 '+ev.best+'</p></div></section>';
 }
-function chartView(ev){
-  const have=new Set(mlist().map(m=>m.day));
-  const ds=DAYS.filter(D=>!D.ko||have.has(D.d));
-  const cols=ds.map(D=>{
+function chartCols(ds,ev){
+  return ds.map(D=>{
     const x=ev.days[D.d];
     const bar=x?'<i class="bar'+(x.c===0?' zero':'')+'" style="height:'+Math.max(x.c/x.n*100,3)+'%"></i>':'';
     return '<div class="col"><div class="plot">'+bar+'</div><b class="cl">'+D.short+'</b><span class="cp">'+(x?pct(x.c,x.n):'—')+'</span><span class="cn">'+(x?x.c+'/'+x.n:'')+'</span></div>';
   }).join('');
+}
+function chartView(ev){
+  const have=new Set(mlist().map(m=>m.day));
+  const sw=DAYS.slice(0,8),ko=DAYS.slice(8),showKo=ko.some(D=>have.has(D.d));
+  const row=ds=>'<div class="chart" style="grid-template-columns:repeat('+ds.length+',minmax(0,1fr))">'+chartCols(ds,ev)+'</div>';
   return '<section class="panel"><div class="ph"><h2>每日準確率</h2><span class="mut">虛線為 50%</span></div>'+
-    '<div class="chart" style="grid-template-columns:repeat('+ds.length+',minmax(0,1fr))">'+cols+'</div></section>';
+    '<p class="mut">瑞士輪</p>'+row(sw)+(showKo?'<p class="mut">淘汰賽</p>'+row(ko):'')+'</section>';
 }
 function navView(){
   const t=(k,l)=>'<button data-act="tab" data-v="'+k+'" class="'+(S.tab===k?'on':'')+'">'+l+'</button>';
@@ -464,6 +479,32 @@ function predictView(ev){
   h+=addPanel();
   return h;
 }
+function koRow(m){
+  const done=!!m.winner,D=DAYS[m.day-1];
+  const side=(c,isW,right)=>{
+    const b=badge(c,true),g=S.favs.includes(c)?'<span class="fw">'+b+'</span>':b;
+    return '<div class="kt'+(right?' r':'')+(done?(isW?' w':' l'):'')+'">'+(right?esc(c)+g:g+esc(c))+'</div>';
+  };
+  return '<div class="kmatch"><span class="kd">'+esc(D.short)+'</span>'+side(m.a,m.winner==='a',false)+
+    '<span class="ks'+(done?' done':'')+'">'+(done?(m.score?dash(m.score):'勝'):'VS')+'</span>'+side(m.b,m.winner==='b',true)+'</div>';
+}
+function koView(){
+  const ms=mlist().filter(m=>m.day>=9);
+  const stages=[['八強賽','BO5 · 輸了就回家',9,12],['四強賽','BO5 · 贏的進總決賽',13,14],['總決賽','BO5 · 贏的是世界冠軍',15,15]];
+  const fin=ms.find(m=>m.day===15&&m.winner);
+  let h='';
+  if(fin){
+    const c=fin[fin.winner];
+    h+='<section class="panel champ">'+badge(c)+'<h2>世界冠軍 '+esc(c)+'</h2><p class="mut">'+esc((TEAMS[c]||{}).n||c)+'</p></section>';
+  }
+  if(!ms.length)return '<section class="panel"><div class="ph"><h2>淘汰賽</h2></div><p class="hint">八強對戰新增後，會顯示在這裡。</p></section>';
+  stages.forEach(g=>{
+    const list=ms.filter(m=>m.day>=g[2]&&m.day<=g[3]);
+    h+='<section class="panel"><div class="ph"><h2>'+g[0]+'</h2><span class="mut">'+g[1]+'</span></div>'+
+      (list.length?list.map(koRow).join(''):'<p class="hint">對戰還沒新增。</p>')+'</section>';
+  });
+  return h;
+}
 function tableView(){
   const st=standings();
   const rows=Object.keys(TEAMS).map(c=>({c,w:st[c].w,l:st[c].l}));
@@ -474,7 +515,7 @@ function tableView(){
     const s=r.w>=3?'<span class="pill ok">晉級八強</span>':r.l>=3?'<span class="pill bad">淘汰</span>':'<span class="pill">進行中</span>';
     return '<tr><td class="t">'+badge(r.c,true)+'<span>'+esc(r.c)+'<br><small>'+esc(t.n)+'</small></span></td><td>'+esc(t.r)+'</td><td class="num"><b>'+r.w+' - '+r.l+'</b></td><td>'+s+'</td></tr>';
   }).join('');
-  return '<section class="panel"><div class="ph"><h2>晉級之路</h2><span class="mut">往右晉級，往下淘汰，金色光暈是本命</span></div>'+pathView()+'</section><section class="panel"><div class="ph"><h2>瑞士輪戰績</h2><span class="mut">由已登記的賽果自動計算</span></div><div class="scroll"><table><thead><tr><th>隊伍</th><th>賽區</th><th>勝 - 敗</th><th>狀態</th></tr></thead><tbody>'+body+'</tbody></table></div></section>';
+  return koView()+'<section class="panel"><div class="ph"><h2>瑞士輪晉級之路</h2><span class="mut">往右晉級，往下淘汰，金色光暈是本命</span></div>'+pathView()+'</section><section class="panel"><div class="ph"><h2>瑞士輪戰績</h2><span class="mut">由已登記的賽果自動計算</span></div><div class="scroll"><table><thead><tr><th>隊伍</th><th>賽區</th><th>勝 - 敗</th><th>狀態</th></tr></thead><tbody>'+body+'</tbody></table></div></section>';
 }
 const STARTS=DAYS.map(D=>{const p=D.date.split('/');return new Date('2026-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T'+D.time+':00+08:00').getTime()});
 function fmtLeft(ms){
@@ -650,7 +691,7 @@ function backupView(){
 }
 function shareView(ev){
   const mb=(k,l)=>'<button data-act="smode" data-v="'+k+'" class="'+(S.shareMode===k?'on':'')+'">'+l+'</button>';
-  let h='<section class="panel"><div class="ph"><h2>分享文字</h2><span class="mut">貼到 LINE 或社群</span></div>'+
+  let h='<section class="panel"><div class="ph"><h2>分享文字</h2><span class="mut">貼到 LINE 或社群，不含你的名字</span></div>'+
     '<div class="seg">'+mb('result','我的戰績')+mb('picks','我的預測')+'</div>'+
     '<textarea class="sharetxt" id="sharetxt" readonly>'+esc(shareText(ev))+'</textarea>'+
     '<div class="srow"><button class="btn fill" data-act="copy">複製文字</button><span class="smsg" id="smsg"></span></div></section>';
